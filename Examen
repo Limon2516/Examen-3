@@ -1,0 +1,58 @@
+#include <stdio.h>
+
+int main() {
+    FILE *archivo;
+    int inicio = 718;
+    int fin = inicio + 49;
+    int palabras[3000] = {0}; // Inicializar el arreglo de palabras con ceros
+
+    archivo = fopen("emailsE.csv", "rb");
+
+    if (archivo == NULL) {
+        perror("Error al abrir el archivo");
+        return 1;
+    }
+
+    // Saltar las primeras filas hasta llegar al renglón de inicio
+    for (int i = 0; i < inicio; i++) {
+        while (fgetc(archivo) != '\n');
+    }
+
+    // Leer los 50 renglones y contar las palabras
+    for (int i = inicio; i <= fin; i++) {
+        char c;
+        int columna = 0;
+        int palabra = 0;
+        int contador = 0;
+
+        while ((c = fgetc(archivo)) != '\n') {
+            if (c == ',') {
+                columna++;
+            } else if (columna > 0 && columna <= 3000) {
+                if (c == '1') {
+                    contador++;
+                }
+            }
+        }
+
+        palabras[palabra] += contador;
+    }
+
+    fclose(archivo);
+
+    // Guardar los resultados en un archivo de texto
+    archivo = fopen("valores.txt", "w");
+
+    if (archivo == NULL) {
+        perror("Error al crear el archivo");
+        return 1;
+    }
+
+    for (int i = 0; i < 3000; i++) {
+        fprintf(archivo, "Palabra %d, %d\n", i+1, palabras[i]);
+    }
+
+    fclose(archivo);
+
+    return 0;
+}
